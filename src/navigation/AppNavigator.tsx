@@ -1,15 +1,20 @@
 import React from 'react';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import HomeScreen from '../screens/home/HomeScreen';
+import { NavigationContainer } from '@react-navigation/native';
+import AuthNavigator from './AuthNavigator';
+import DrawerNavigator from './DrawerNavigator';
+import { useSelector } from 'react-redux';
 
-const Drawer = createDrawerNavigator();
+const AppNavigator = () => {
+  // Access the username from Redux (instead of isLoggedIn)
+  const username = useSelector((state: any) => state.auth.username);
 
-const DrawerNavigator = () => {
   return (
-    <Drawer.Navigator>
-      <Drawer.Screen name="Home" component={HomeScreen} />
-    </Drawer.Navigator>
+    
+    <NavigationContainer>
+      {/* If username is not null, we assume the user is logged in */}
+      {username ? <DrawerNavigator /> : <AuthNavigator />}
+    </NavigationContainer>
   );
 };
 
-export default DrawerNavigator;
+export default AppNavigator;

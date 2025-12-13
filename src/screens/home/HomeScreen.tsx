@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
+import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { login } from '../../redux/slices/authSlice';
 import type { AppDispatch } from '../../redux/store';
