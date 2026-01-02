@@ -3,32 +3,34 @@ import { loginService } from '../../services/authService';
 
 interface AuthState {
   username: string | null;
-  password: string | null; // optional, can remove later
+  token: string | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: AuthState = {
   username: null,
-  password: null,
+  token: null,
   loading: false,
   error: null,
 };
 
-// Async thunk to call loginService
-export const loginAsync = createAsyncThunk(
+// Async thunk
+export const loginAsync = createAsyncThunk<
+  { username: string; token?: string }, // return type
+  { username: string; password: string }, // argument type
+  { rejectValue: string } // reject type
+>(
   'auth/loginAsync',
-  async (
-    { username, password }: { username: string; password: string },
-    { rejectWithValue }
-  ) => {
+  async ({ username, password }, { rejectWithValue }) => {
     try {
-      console.log(username, password)
+
+      
       const response = await loginService(username, password);
-       console.log(response)
+      
       return response; // { username, token? }
     } catch (err: any) {
-      return rejectWithValue(err || 'Login failed');
+      return rejectWithValue(err?.message || 'Login failed');
     }
   }
 );
@@ -39,7 +41,7 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.username = null;
-      state.password = null;
+      state.token = null;
       state.loading = false;
       state.error = null;
     },
@@ -53,11 +55,11 @@ const authSlice = createSlice({
       .addCase(loginAsync.fulfilled, (state, action) => {
         state.loading = false;
         state.username = action.payload.username;
-        state.password = null; // clear password for security
+        state.token = action.payload.token ?? null;
       })
       .addCase(loginAsync.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string' ? action.payload : 'Login failed';
       });
   },
 });

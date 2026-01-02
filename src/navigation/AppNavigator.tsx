@@ -1,19 +1,21 @@
+import 'react-native-gesture-handler'; // MUST be at the very top
 import React from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
-import AuthNavigator from './AuthNavigator';
-import DrawerNavigator from './DrawerNavigator';
 import { useSelector } from 'react-redux';
+import AuthNavigator from './AuthNavigator';
+import MainStack from './MainStack';
+import type { RootState } from '../redux/store';
 
 const AppNavigator = () => {
-  // Access the username from Redux (instead of isLoggedIn)
-  const username = useSelector((state: any) => state.auth.username);
+  const token = useSelector((state: RootState) => state.auth.token);
 
   return (
-    
-    <NavigationContainer>
-      {/* If username is not null, we assume the user is logged in */}
-      {username ? <DrawerNavigator /> : <AuthNavigator />}
-    </NavigationContainer>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer>
+        {token ? <MainStack /> : <AuthNavigator />}
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 };
 

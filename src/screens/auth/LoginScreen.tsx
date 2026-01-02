@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Pressable, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, TextInput, Pressable, Text, StyleSheet, Dimensions, ActivityIndicator  } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { loginAsync } from '../../redux/slices/authSlice';
 import type { AppDispatch } from '../../redux/store';
@@ -16,17 +16,28 @@ type RootStackParamList = {
 };
 
 const LoginScreen = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('aukhan288@gmail.com');
+  const [password, setPassword] = useState('Admin12#');
   const [logoWidth, setLogowidth] = useState(268);
   const [hidePassword, setHidePassword] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const handleLogin = () => {
-    dispatch(loginAsync({ username, password }));
 
-  };
+  const handleLogin = async () => {
+     if (loading) return;
+     setLoading(true);
+     try {
+     await dispatch(loginAsync({ username, password })).unwrap();
+     }catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+     
+     
+  }
 
   // 🚀 Smooth looping animation for the white bar
   useEffect(() => {
@@ -57,6 +68,7 @@ const LoginScreen = () => {
 
       {/* Username Input */}
       <TextInput
+        editable={!loading}
         placeholder="Email"
         value={username}
         onChangeText={setUsername}
@@ -68,8 +80,9 @@ const LoginScreen = () => {
       {/* Password Input */}
       <View style={styles.passwordContainer}>
         <TextInput
+          editable={!loading}
           placeholder="Password"
-          value={password}
+          value={password} 
           onChangeText={setPassword}
           style={styles.passwordInput}
           secureTextEntry={hidePassword}
@@ -85,15 +98,26 @@ const LoginScreen = () => {
 
       {/* Login Button */}
       <Pressable
+        disabled={loading}
         onPress={handleLogin}
-        style={({ pressed }) => [
+       style={({ pressed }) => [
           styles.button,
           {
-            backgroundColor: pressed ? '#F7B551' : '#103B38',
-            transform: [{ scale: pressed ? 0.97 : 1 }],
+            backgroundColor: loading
+              ? '#9DB9B7'
+              : pressed
+              ? '#F7B551'
+              : '#103B38',
+            transform: [{ scale: pressed && !loading ? 0.97 : 1 }],
+            opacity: loading ? 0.8 : 1,
           },
         ]}>
-        <Text style={styles.buttonText}>Login</Text>
+        {loading ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.buttonText}>Login</Text>
+          )}
+        
       </Pressable>
     </View>
   );
